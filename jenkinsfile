@@ -1,0 +1,30 @@
+
+pipeline {
+    agent any
+
+    stages {
+        stage('scm clone') {
+            steps {
+                echo 'cloning from scm'
+                git credentialsId: 'e9e8d619-8e29-471e-a9b5-95fef238b369', url: 'https://github.com/wakaleo/game-of-life'
+            }
+        }
+     stage('Maven build') {
+            steps {
+                echo 'Maven building'
+                sh 'mvn clean install '
+            }
+        }
+	 stage('Deploy') {
+            steps {
+                echo 'Tomcat'
+                deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://54.82.14.252:8090/')], contextPath: 'Facebook', war: '**/*.war'
+            }
+        }	
+	 stage('Kubernetes') {
+            steps {
+                echo 'Cluster'
+            }
+        }
+	}
+}
